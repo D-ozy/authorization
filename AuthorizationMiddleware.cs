@@ -48,16 +48,10 @@ namespace authorization
                             db.Users.Add(user);
                             db.SaveChanges();
                         }
-                        else if (request.Path == "/auth/check" && request.Method == "GET")
-                        {
-                            await CheckUserExists(response, request);
-                        }
                         else
                         {
                             await response.WriteAsJsonAsync(new { exMessage = "userExist" });
                         }
-                        
-
 
                         //создание токена
                         var tokenGenerator = new Token(new TokenSettings());
@@ -79,37 +73,6 @@ namespace authorization
             {
                 response.StatusCode = 404;
                 await response.WriteAsJsonAsync(new { message = ex });
-            }
-        }
-
-
-        private async Task CheckUserExists(HttpResponse response, HttpRequest request)
-        {
-            try
-            {
-                var name = request.Query["name"];
-                var email = request.Query["email"];
-
-                using (AuthorizationDbContext db = new AuthorizationDbContext())
-                {
-                    bool userExists = db.Users.Any(u => u.Name == name || u.Email == email);
-
-                    if (userExists)
-                    {
-                        response.StatusCode = 200; // OK
-                        await response.WriteAsJsonAsync(new { exists = true });
-                    }
-                    else
-                    {
-                        response.StatusCode = 200; // OK
-                        await response.WriteAsJsonAsync(new { exists = true });
-                    }
-                }
-            }
-            catch (Exception ex) 
-            {
-                response.StatusCode = 500; // Internal Server Error
-                await response.WriteAsJsonAsync(new { message = ex.Message });
             }
         }
 
