@@ -40,19 +40,22 @@ namespace authorization
             AuthorizationDbContext db = new AuthorizationDbContext();
 
             var name = request.Query["name"].ToString();
+            var email = request.Query["email"].ToString();
 
-            bool userExists = db.Users.Any(u => u.Name == name);
+            
+            if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(email))
+            {
+                response.StatusCode = StatusCodes.Status400BadRequest;
+                await response.WriteAsync(JsonSerializer.Serialize(new { error = "Имя или email не могут быть пустыми." }));
+                return;
+            }
 
-            response.ContentType = "application/json"; // Устанавливаем тип контента
-            if (userExists)
-            {
-                await response.WriteAsync(JsonSerializer.Serialize(new { exists = true }));
-            }
-            else
-            {
-                await response.WriteAsync(JsonSerializer.Serialize(new { exists = false }));
-            }
+            bool userExists = db.Users.Any(u => u.Name == name || u.Email == email);
+
+            response.ContentType = "application/json";
+            await response.WriteAsync(JsonSerializer.Serialize(new { exists = userExists }));
         }
+
 
         private async Task AddUser(HttpResponse response, HttpRequest request)
         {
@@ -66,16 +69,9 @@ namespace authorization
                     {
                         user.Id = Guid.NewGuid().ToString();
                         user.Password = Hash(user.Password);
+                        db.Users.Add(user);
+                        db.SaveChanges();
 
-                        if(!db.Users.Any(x => x.Name == user.Name) && !db.Users.Any(x => x.Email == user.Email))
-                        {
-                            db.Users.Add(user);
-                            db.SaveChanges();
-                        }
-                        else
-                        {
-                            await response.WriteAsJsonAsync(new { exMessage = "userExist" });
-                        }
 
                         //создание токена
                         var tokenGenerator = new Token(new TokenSettings());

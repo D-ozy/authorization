@@ -51,12 +51,10 @@ namespace authorization
             {
                 context.Response.ContentType = "text/html; charset=utf-8";
 
-                if(context.Request.Path != "/auth")
+                if(context.Request.Path == "/")
                 {
                     context.Response.Redirect("/Front/registration/reg.html");
-                }
-
-               //await context.Response.SendFileAsync("wwwroot/front/reg.html");
+                } 
             });
 
             app.Run();
