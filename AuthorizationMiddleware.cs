@@ -3,6 +3,7 @@ using authorization.Models;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace authorization
@@ -20,13 +21,36 @@ namespace authorization
             var request = context.Request;
 
 
-            if (request.Path == "/auth/add" && request.Method == "POST") 
+            if (request.Path == "/auth/check" && request.Method == "GET")
+            {
+                await GetUser(response, request);
+            }
+            else if (request.Path == "/auth/add" && request.Method == "POST") 
             {
                 await AddUser(response, request); 
             }
             else
             {
                 await next.Invoke(context);
+            }
+        }
+
+        private async Task GetUser(HttpResponse response, HttpRequest request)
+        {
+            AuthorizationDbContext db = new AuthorizationDbContext();
+
+            var name = request.Query["name"].ToString();
+
+            bool userExists = db.Users.Any(u => u.Name == name);
+
+            response.ContentType = "application/json"; // Устанавливаем тип контента
+            if (userExists)
+            {
+                await response.WriteAsync(JsonSerializer.Serialize(new { exists = true }));
+            }
+            else
+            {
+                await response.WriteAsync(JsonSerializer.Serialize(new { exists = false }));
             }
         }
 
