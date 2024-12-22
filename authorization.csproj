@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <None Include="wwwroot\Front\entrance.html" />
+    <None Include="wwwroot\Front\registration\reg.html" />
   </ItemGroup>
 
 </Project>

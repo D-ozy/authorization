@@ -43,6 +43,8 @@ namespace authorization
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseStaticFiles();
+
             app.UseMiddleware<AuthorizationMiddleware>();
 
             app.Run(async (context) =>
@@ -51,10 +53,10 @@ namespace authorization
 
                 if(context.Request.Path != "/auth")
                 {
-                    context.Response.Redirect("/auth");
+                    context.Response.Redirect("/Front/registration/reg.html");
                 }
 
-               await context.Response.SendFileAsync("front/reg.html");
+               //await context.Response.SendFileAsync("wwwroot/front/reg.html");
             });
 
             app.Run();

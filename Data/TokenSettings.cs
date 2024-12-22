@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace authorization
+namespace authorization.Data
 {
     public class TokenSettings
     {
