@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\Front\entrance.html" />
+    <None Include="wwwroot\Front\authenticate\entrance.html" />
     <None Include="wwwroot\Front\registration\reg.html" />
   </ItemGroup>
 

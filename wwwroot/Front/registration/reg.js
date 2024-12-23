@@ -9,6 +9,15 @@
     // Очистка сообщения перед валидацией
     document.getElementById('message').innerText = '';
 
+    // Проверяем, существует ли пользователь
+    const userExists = await checkUserExists(name, email);
+    if (userExists) {
+        document.getElementById('message').innerText = 'Пользователь с таким именем или email уже существует.';
+        document.getElementById('name').value = '';
+        document.getElementById('email').value = '';
+        return; // Завершаем выполнение, если пользователь существует
+    }
+
     // Валидация имени пользователя
     if (name.length < 5) {
         document.getElementById('message').innerText = 'Имя пользователя должно быть больше 5 символов.';
@@ -35,6 +44,7 @@
     if (!letterRegex.test(password)) {
         document.getElementById('message').innerText = 'Пароль должен содержать хотя бы одну букву.';
         document.getElementById('password').value = '';
+        document.getElementById('passwordConfirmation').value = '';
         return; // Завершаем выполнение, если пароль некорректен
     }
 
@@ -46,16 +56,6 @@
         return; // Завершаем выполнение, если пароли не совпадают
     }
 
-    // Проверяем, существует ли пользователь
-    const userExists = await checkUserExists(name, email);
-    if (userExists) {
-        document.getElementById('message').innerText = 'Пользователь с таким именем или email уже существует.';
-        document.getElementById('name').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('password').value = '';
-        document.getElementById('passwordConfirmation').value = '';
-        return; // Завершаем выполнение, если пользователь существует
-    }
 
     // Если пользователь не существует, создаем нового
     const user = { name, email, password };
@@ -72,6 +72,8 @@
         if (response.ok) {
             const result = await response.json();
             document.getElementById('message').innerText = `Пользователь ${name} успешно зарегистрирован!`;
+
+            console.log(result)
 
             // Очистка полей ввода
             document.getElementById('name').value = '';

@@ -8,11 +8,11 @@ using System.Text.RegularExpressions;
 
 namespace authorization
 {
-    public class AuthorizationMiddleware
+    public class RegistrationMiddleware
     {
         private readonly RequestDelegate next;
 
-        public AuthorizationMiddleware(RequestDelegate next) { this.next = next; }
+        public RegistrationMiddleware(RequestDelegate next) { this.next = next; }
 
         
         public async Task InvokeAsync(HttpContext context)
@@ -76,12 +76,14 @@ namespace authorization
                         //создание токена
                         var tokenGenerator = new Token(new TokenSettings());
 
-                        var token = tokenGenerator.GenerateToken(user.Id, user.Email);
+                        string token = tokenGenerator.GenerateToken(user.Id, user.Email);
                         response.StatusCode = 200;
 
                         await response.WriteAsJsonAsync(token);
 
-                        Console.WriteLine(token);
+                        //await CookieAdd(response, request, token);
+
+                        
                     }
                 }
                 else
@@ -96,7 +98,18 @@ namespace authorization
             }
         }
 
-
+        private async Task CookieAdd(HttpResponse response, HttpRequest request, string token)
+        {
+            if(request.Cookies.ContainsKey("token"))
+            {
+                string? tokenKey = request.Cookies["token"];
+                await response.WriteAsJsonAsync($"Token: {tokenKey}");
+            } 
+            else
+            {
+                response.Cookies.Append("Token", token);
+            }
+        }
 
         private string Hash(string pass)
         {

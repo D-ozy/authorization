@@ -45,7 +45,8 @@ namespace authorization
 
             app.UseStaticFiles();
 
-            app.UseMiddleware<AuthorizationMiddleware>();
+            app.UseMiddleware<RegistrationMiddleware>();
+            app.UseMiddleware<EntranceMiddleware>();
 
             app.Run(async (context) =>
             {
@@ -54,7 +55,10 @@ namespace authorization
                 if(context.Request.Path == "/")
                 {
                     context.Response.Redirect("/Front/registration/reg.html");
-                } 
+                }
+
+                await context.Response.WriteAsync("Дароу");
+               
             });
 
             app.Run();
