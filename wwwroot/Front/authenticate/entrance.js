@@ -8,10 +8,10 @@
     const userExists = await checkUserExists(userNameOrEmail, password);
 
     if (userExists) {
-        alert("Дароу")
+        window.location.href = "../plug/plug.html"
         return;
     } else {
-        alert("Тебя не существует")
+        document.getElementById('message').innerText = 'Недействительные данные';
         return;
     }
 })

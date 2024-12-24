@@ -1,4 +1,4 @@
-﻿namespace authorization.Data
+﻿namespace authorization.Models
 {
     public class Person
     {

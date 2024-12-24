@@ -36,6 +36,7 @@
     if (password.length < 6) {
         document.getElementById('message').innerText = 'Пароль должен быть не менее 6 символов.';
         document.getElementById('password').value = '';
+        document.getElementById('passwordConfirmation').value = '';
         return; // Завершаем выполнение, если пароль некорректен
     }
 
@@ -72,8 +73,6 @@
         if (response.ok) {
             const result = await response.json();
             document.getElementById('message').innerText = `Пользователь ${name} успешно зарегистрирован!`;
-
-            console.log(result)
 
             // Очистка полей ввода
             document.getElementById('name').value = '';

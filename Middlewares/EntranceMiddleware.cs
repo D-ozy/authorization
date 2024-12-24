@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using authorization.Data;
 using System.Text.Json;
 
-namespace authorization
+namespace authorization.Middlewares
 {
     public class EntranceMiddleware
     {
@@ -22,7 +22,7 @@ namespace authorization
             }
             else
             {
-                await next.Invoke(context);    
+                await next.Invoke(context);
             }
 
 

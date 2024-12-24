@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace authorization
+namespace authorization.Middlewares
 {
     public class RegistrationMiddleware
     {
@@ -14,7 +14,7 @@ namespace authorization
 
         public RegistrationMiddleware(RequestDelegate next) { this.next = next; }
 
-        
+
         public async Task InvokeAsync(HttpContext context)
         {
             var response = context.Response;
@@ -25,9 +25,9 @@ namespace authorization
             {
                 await GetUser(response, request);
             }
-            else if (request.Path == "/auth/add" && request.Method == "POST") 
+            else if (request.Path == "/auth/add" && request.Method == "POST")
             {
-                await AddUser(response, request); 
+                await AddUser(response, request);
             }
             else
             {
@@ -42,7 +42,7 @@ namespace authorization
             var name = request.Query["name"].ToString();
             var email = request.Query["email"].ToString();
 
-            
+
             if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(email))
             {
                 response.StatusCode = StatusCodes.Status400BadRequest;
@@ -72,18 +72,15 @@ namespace authorization
                         db.Users.Add(user);
                         db.SaveChanges();
 
-
                         //создание токена
                         var tokenGenerator = new Token(new TokenSettings());
-
                         string token = tokenGenerator.GenerateToken(user.Id, user.Email);
                         response.StatusCode = 200;
 
+                        //добавление куков
+                        CookieAdd(response, token);
+
                         await response.WriteAsJsonAsync(token);
-
-                        //await CookieAdd(response, request, token);
-
-                        
                     }
                 }
                 else
@@ -91,24 +88,22 @@ namespace authorization
                     throw new Exception("Uncorrected Data");
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 response.StatusCode = 404;
                 await response.WriteAsJsonAsync(new { message = ex });
             }
         }
 
-        private async Task CookieAdd(HttpResponse response, HttpRequest request, string token)
+        private void CookieAdd(HttpResponse response, string token)
         {
-            if(request.Cookies.ContainsKey("token"))
+            response.Cookies.Append("AuthToken", token, new CookieOptions
             {
-                string? tokenKey = request.Cookies["token"];
-                await response.WriteAsJsonAsync($"Token: {tokenKey}");
-            } 
-            else
-            {
-                response.Cookies.Append("Token", token);
-            }
+                HttpOnly = true, 
+                Secure = true, 
+                SameSite = SameSiteMode.Strict, 
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
         }
 
         private string Hash(string pass)

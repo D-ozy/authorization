@@ -2,10 +2,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using authorization.Data;
 using Microsoft.IdentityModel.Tokens;
 
-namespace authorization
+namespace authorization.Data
 {
     public class Token
     {
