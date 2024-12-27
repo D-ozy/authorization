@@ -1,0 +1,21 @@
+﻿version: '3.8'  # Укажите версию Docker Compose
+
+services:
+  web:
+    image: authorization  # Имя образа для сервиса web
+    build:
+      context: .  # Контекст сборки (текущая директория)
+      dockerfile: Dockerfile  # Имя Dockerfile
+    ports:
+      - "80:80"  # Привязка порта 80 на хосте к порту 80 в контейнере
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=195.133.144.62;Database=project;User=admin;Password=adminPass_113389;  # Строка подключения к базе данных
+
+  db:
+    image: mcr.microsoft.com/mssql/server  # Образ SQL Server
+    environment:
+      - SA_PASSWORD=YourStrong!Passw0rd  # Пароль для SA
+      - ACCEPT_EULA=Y  # Принятие лицензионного соглашения
+    ports:
+      - "1433:1433"  # Привязка порта 1433 на хосте к порту 1433 в контейнере
+ 

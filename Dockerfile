@@ -1,39 +1,29 @@
 ﻿# Используем официальный образ .NET
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["YourProject.csproj", "./"]
-RUN dotnet restore "./YourProject.csproj"
+
+# Копируем файл проекта и восстанавливаем зависимости
+COPY ["authorization.csproj", "./"]
+RUN dotnet restore "./authorization.csproj"
+
+# Копируем остальные файлы проекта
 COPY . .
+
+# Строим проект
 WORKDIR "/src/."
-RUN dotnet build "YourProject.csproj" -c Release -o /app/build
+RUN dotnet build "authorization.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "YourProject.csproj" -c Release -o /app/publish
+# Публикуем проект
+RUN dotnet publish "authorization.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+# Копируем опубликованные файлы в финальный образ
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "YourProject.dll"]# Используем официальный образ .NET
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-WORKDIR /app
-EXPOSE 80
-
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["YourProject.csproj", "./"]
-RUN dotnet restore "./YourProject.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "YourProject.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "YourProject.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "YourProject.dll"]
+# Указываем команду для запуска приложения
+ENTRYPOINT ["dotnet", "authorization.dll"]
